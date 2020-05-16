@@ -4,30 +4,28 @@ const { User, Post, Comment, Like } = models;
 
 interface commentInterface {
   message: string;
+  username: string;
   userId?: number;
   postId: number;
 }
 
-export const createComment = async (
-  message: commentInterface,
+export const createLike = async (
   userId: number,
-  postId: number
+  postId: number,
+  username: string
 ) => {
   try {
-    // const comments = await Comment.create({
-    //   ...message,
-    //   userId: id,
-    //   postId,
-    // });
-    const findPost = await Post.findOne({ where: { id: postId } });
-    if (findPost) {
-      const comments = await Comment.create({
-        ...message,
+    const findPost = await Like.findOne({ where: { userId, postId } });
+    if (!findPost) {
+      const like = await Like.create({
+        message: `${username} liked your post`,
         userId,
         postId,
+        username,
       });
-      return { status: "success", comments };
+      return { status: "success", like };
     }
+    await Like.destroy({ where: { userId } });
     return { status: "error", message: "Post not found" };
   } catch (error) {
     console.error(error);

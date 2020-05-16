@@ -11,25 +11,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
-exports.createLinks = (post, id) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield Post.create(Object.assign(Object.assign({}, post), { userId: Number(id) }));
-        return { status: "success", data: posts };
+        const findPost = yield Like.findOne({ where: { userId, postId } });
+        if (!findPost) {
+            const like = yield Like.create({
+                message: `${username} liked your post`,
+                userId,
+                postId,
+                username,
+            });
+            return { status: "success", like };
+        }
+        yield Like.destroy({ where: { userId } });
+        return { status: "error", message: "Post not found" };
     }
     catch (error) {
         console.error(error);
         return { status: "error", error };
     }
 });
-exports.getLinks = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.getComments = (postId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield Post.findAll({
-            include: [User, Comment, Like],
+        const comments = yield Comment.findAll({
+            where: {
+                postId,
+            },
+            include: [User, Post],
         });
-        return { status: "success", data: posts };
+        return { status: "success", comments };
     }
     catch (error) {
         return { status: "error", error };
     }
 });
-//# sourceMappingURL=post_controller.js.map
+//# sourceMappingURL=like_controller.js.map

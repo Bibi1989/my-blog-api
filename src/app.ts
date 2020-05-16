@@ -12,6 +12,7 @@ const app = express();
 // imports
 import postRoute from "./routes/posts";
 import commentsRoute from "./routes/comment";
+import likeRoute from "./routes/likes";
 import userRoute from "./routes/users";
 
 app.use(cors());
@@ -23,6 +24,7 @@ app.use(cookieParser());
 // routes
 app.use("/api/v1/posts", postRoute);
 app.use("/api/v1/comments", commentsRoute);
+app.use("/api/v1/likes", likeRoute);
 app.use("/auth/v1", userRoute);
 
 // catch 404 and forward to error handler

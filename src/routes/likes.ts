@@ -1,14 +1,15 @@
 import { Router } from "express";
-import { getComments, createComment } from "../controllers/comment_controller";
+import { getComments, createLike } from "../controllers/like_controller";
 import authenticate from "./auth";
 
 const router = Router();
 
-router.post("/:postId", authenticate, async (req: any, res) => {
+router.post("/", authenticate, async (req: any, res) => {
   const body = req.body;
-  const { id } = req.user;
-  const { postId } = req.params;
-  const link = await createComment(body, Number(id), Number(postId));
+  const { id, username } = req.user;
+  console.log(req.user);
+  const { postId } = req.body;
+  const link = await createLike(Number(id), Number(postId), username);
   res.json({ data: link });
 });
 

@@ -1,6 +1,6 @@
 const models = require("../../database/models/");
 
-const { User, Post, Comment, Notification } = models;
+const { User, Post, Comment, Like } = models;
 
 interface postInterface {
   id?: string;
@@ -27,7 +27,7 @@ export const createLinks = async (post: postInterface, id: number) => {
 export const getLinks = async () => {
   try {
     const posts = await Post.findAll({
-      include: [User, Comment],
+      include: [User, Comment, Like],
     });
     return { status: "success", data: posts };
   } catch (error) {

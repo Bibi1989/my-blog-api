@@ -10,22 +10,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const models = require("../../database/models/");
-const { User, Post, Comment } = models;
-exports.createComment = (message, id, postId) => __awaiter(void 0, void 0, void 0, function* () {
+const { User, Post, Comment, Like } = models;
+exports.createComment = (message, userId, postId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const comments = yield Comment.create(Object.assign(Object.assign({}, message), { userId: id, postId }));
-        return { status: "success", comments };
+        // const comments = await Comment.create({
+        //   ...message,
+        //   userId: id,
+        //   postId,
+        // });
+        const findPost = yield Post.findOne({ where: { id: postId } });
+        if (findPost) {
+            const comments = yield Comment.create(Object.assign(Object.assign({}, message), { userId,
+                postId }));
+            return { status: "success", comments };
+        }
+        return { status: "error", message: "Post not found" };
     }
     catch (error) {
         console.error(error);
         return { status: "error", error };
     }
 });
-exports.getComments = (id) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getComments = (postId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const comments = yield Comment.findAll({
             where: {
-                postId: id,
+                postId,
             },
             include: [User, Post],
         });
