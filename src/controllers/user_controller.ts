@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { genSalt } from "bcrypt";
 const models = require("../../database/models/");
-const { User, Url } = models;
+const { User, Post } = models;
 
 interface userInterface {
   username: string;
   email: string;
   password: string;
+  image_url?: string;
 }
 
 export const createUsers = async (user: userInterface) => {
@@ -16,22 +16,23 @@ export const createUsers = async (user: userInterface) => {
       email: user.email,
     },
   });
-  //   console.log();
   try {
     if (findUser) {
       return { status: "error", error: "User with this email exist" };
     }
-    const salt = await genSalt(10);
+    const salt = await bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(user.password, salt);
+    console.log(hashedPassword);
     const users = await User.create({
       ...user,
-      hashedPassword,
+      password: hashedPassword,
     });
     const token = jwt.sign(
       {
         id: users.id,
         email: users.email,
         username: users.username,
+        image_url: users.image_url,
       },
       process.env.SECRET_KEY
     );
@@ -45,7 +46,7 @@ export const createUsers = async (user: userInterface) => {
 export const getUsers = async () => {
   try {
     const users = await User.findAll({
-      include: [Url],
+      include: [Post],
     });
     return { status: "success", data: users };
   } catch (error) {

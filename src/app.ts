@@ -10,8 +10,8 @@ dotenv.config();
 const app = express();
 
 // imports
-import linksRoute from "./routes/links";
-import historyRoute from "./routes/history";
+import postRoute from "./routes/posts";
+import commentsRoute from "./routes/comment";
 import userRoute from "./routes/users";
 
 app.use(cors());
@@ -21,8 +21,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // routes
-app.use("/api/v1/links", linksRoute);
-app.use("/api/v1/history", historyRoute);
+app.use("/api/v1/posts", postRoute);
+app.use("/api/v1/comments", commentsRoute);
 app.use("/auth/v1", userRoute);
 
 // catch 404 and forward to error handler

@@ -12,8 +12,8 @@ const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = express_1.default();
 // imports
-const links_1 = __importDefault(require("./routes/links"));
-const history_1 = __importDefault(require("./routes/history"));
+const posts_1 = __importDefault(require("./routes/posts"));
+const comment_1 = __importDefault(require("./routes/comment"));
 const users_1 = __importDefault(require("./routes/users"));
 app.use(cors_1.default());
 app.use(morgan_1.default("dev"));
@@ -21,8 +21,8 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cookie_parser_1.default());
 // routes
-app.use("/api/v1/links", links_1.default);
-app.use("/api/v1/history", history_1.default);
+app.use("/api/v1/posts", posts_1.default);
+app.use("/api/v1/comments", comment_1.default);
 app.use("/auth/v1", users_1.default);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

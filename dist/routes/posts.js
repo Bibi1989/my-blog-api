@@ -13,18 +13,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const comment_controller_1 = require("../controllers/comment_controller");
+const post_controller_1 = require("../controllers/post_controller");
 const auth_1 = __importDefault(require("./auth"));
 const router = express_1.Router();
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id } = req.user;
-    const link = yield comment_controller_1.createHistory(body, id);
-    res.json({ data: link });
+    const post = yield post_controller_1.createLinks(body, id);
+    res.json({ data: post });
 }));
-router.get("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const links = yield comment_controller_1.getHistories();
-    res.json({ data: links });
+router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const posts = yield post_controller_1.getLinks();
+    res.json({ data: posts });
 }));
 exports.default = router;
-//# sourceMappingURL=history.js.map
+//# sourceMappingURL=posts.js.map
