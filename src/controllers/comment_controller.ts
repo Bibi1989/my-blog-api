@@ -14,13 +14,6 @@ export const createComment = async (
   postId: number
 ) => {
   try {
-    // const comments = await Comment.create({
-    //   ...message,
-    //   userId: id,
-    //   postId,
-    // });
-
-    console.log({ message });
     const findPost = await Post.findOne({ where: { id: postId } });
     if (findPost) {
       const comments = await Comment.create({

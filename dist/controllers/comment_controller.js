@@ -13,12 +13,6 @@ const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 exports.createComment = (message, userId, postId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const comments = await Comment.create({
-        //   ...message,
-        //   userId: id,
-        //   postId,
-        // });
-        console.log({ message });
         const findPost = yield Post.findOne({ where: { id: postId } });
         if (findPost) {
             const comments = yield Comment.create({
