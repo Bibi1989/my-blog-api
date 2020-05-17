@@ -65,7 +65,6 @@ export const loginUser = async (user: any) => {
       email: user.email,
     },
   });
-  // console.log(findUser);
   if (!findUser)
     return { status: "error", error: "Invalid email or your yet to register" };
   try {
@@ -73,7 +72,6 @@ export const loginUser = async (user: any) => {
       user.password,
       findUser.dataValues.password
     );
-    // console.log(findUser.dataValues.password);
     if (isMatchPassword) {
       const token = jwt.sign(
         {

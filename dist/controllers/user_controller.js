@@ -70,12 +70,10 @@ exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
             email: user.email,
         },
     });
-    // console.log(findUser);
     if (!findUser)
         return { status: "error", error: "Invalid email or your yet to register" };
     try {
         const isMatchPassword = yield bcryptjs_1.default.compare(user.password, findUser.dataValues.password);
-        // console.log(findUser.dataValues.password);
         if (isMatchPassword) {
             const token = jsonwebtoken_1.default.sign({
                 id: findUser.dataValues.id,
