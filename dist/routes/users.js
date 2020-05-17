@@ -18,6 +18,12 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
     res.header("auth", user.token);
     res.json({ data: user });
 }));
+router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    const user = yield user_controller_1.loginUser(body);
+    res.header("auth", user.token);
+    res.json({ data: user });
+}));
 router.get("/users", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_controller_1.getUsers();
     res.json({ data: users });

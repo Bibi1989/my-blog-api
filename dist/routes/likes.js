@@ -17,18 +17,16 @@ const like_controller_1 = require("../controllers/like_controller");
 const auth_1 = __importDefault(require("./auth"));
 const router = express_1.Router();
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
     const { id, username } = req.user;
-    console.log(req.user);
     const { postId } = req.body;
+    console.log(postId);
     const link = yield like_controller_1.createLike(Number(id), Number(postId), username);
     res.json({ data: link });
 }));
 router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId } = req.params;
-    const links = yield like_controller_1.getComments(Number(postId));
-    console.log(links);
-    res.json({ data: links });
+    const likes = yield like_controller_1.getLikes(Number(postId));
+    res.json({ data: likes });
 }));
 exports.default = router;
 //# sourceMappingURL=likes.js.map

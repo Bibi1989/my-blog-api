@@ -17,6 +17,12 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const models = require("../../database/models/");
 const { User, Post } = models;
 exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!user.username)
+        return { status: "error", error: "Username is empty!!!" };
+    if (!user.email)
+        return { status: "error", error: "Email is empty!!!" };
+    if (!user.password)
+        return { status: "error", error: "Password is empty!!!" };
     const findUser = yield User.findOne({
         where: {
             email: user.email,
@@ -53,5 +59,36 @@ exports.getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         return { status: "error", error };
     }
+});
+exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!user.email)
+        return { status: "error", error: "Email is empty!!!" };
+    if (!user.password)
+        return { status: "error", error: "Password is empty!!!" };
+    const findUser = yield User.findOne({
+        where: {
+            email: user.email,
+        },
+    });
+    // console.log(findUser);
+    if (!findUser)
+        return { status: "error", error: "Invalid email or your yet to register" };
+    try {
+        const isMatchPassword = yield bcryptjs_1.default.compare(user.password, findUser.dataValues.password);
+        // console.log(findUser.dataValues.password);
+        if (isMatchPassword) {
+            const token = jsonwebtoken_1.default.sign({
+                id: findUser.dataValues.id,
+                email: findUser.dataValues.email,
+                username: findUser.dataValues.username,
+                image_url: findUser.dataValues.image_url,
+            }, process.env.SECRET_KEY);
+            return { status: "success", data: findUser.dataValues, token };
+        }
+        else {
+            return { status: "error", error: "password is invalid" };
+        }
+    }
+    catch (error) { }
 });
 //# sourceMappingURL=user_controller.js.map

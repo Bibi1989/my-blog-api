@@ -15,7 +15,7 @@ export const createLike = async (
   username: string
 ) => {
   try {
-    const findPost = await Like.findOne({ where: { userId, postId } });
+    const findPost = await Like.findOne({ where: { postId, userId } });
     if (!findPost) {
       const like = await Like.create({
         message: `${username} liked your post`,
@@ -24,24 +24,25 @@ export const createLike = async (
         username,
       });
       return { status: "success", like };
+    } else {
+      await Like.destroy({ where: { postId, userId } });
+      return { status: "error", message: "Post not found" };
     }
-    await Like.destroy({ where: { userId } });
-    return { status: "error", message: "Post not found" };
   } catch (error) {
     console.error(error);
     return { status: "error", error };
   }
 };
 
-export const getComments = async (postId: number) => {
+export const getLikes = async (postId: number) => {
   try {
-    const comments = await Comment.findAll({
+    const likes = await Like.findAll({
       where: {
         postId,
       },
       include: [User, Post],
     });
-    return { status: "success", comments };
+    return { status: "success", likes };
   } catch (error) {
     return { status: "error", error };
   }

@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
-exports.createLinks = (post, id) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield Post.create(Object.assign(Object.assign({}, post), { userId: Number(id) }));
+        const posts = yield Post.create(Object.assign(Object.assign({}, post), { username, userId: Number(id) }));
         return { status: "success", data: posts };
     }
     catch (error) {
@@ -21,12 +21,40 @@ exports.createLinks = (post, id) => __awaiter(void 0, void 0, void 0, function* 
         return { status: "error", error };
     }
 });
-exports.getLinks = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.getPosts = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const posts = yield Post.findAll({
             include: [User, Comment, Like],
         });
         return { status: "success", data: posts };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.getAPost = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post.findOne({
+            where: { id },
+            include: [User, Comment, Like],
+        });
+        return { status: "success", data: post };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.updatePost = (post) => __awaiter(void 0, void 0, void 0, function* () {
+    const findPost = yield Post.findOne({
+        where: { id: post.id },
+    });
+    try {
+        if (findPost) {
+            yield Post.update(post, { where: { id: post.id } }, {
+                include: [User, Comment, Like],
+            });
+        }
+        return { status: "success", data: post };
     }
     catch (error) {
         return { status: "error", error };

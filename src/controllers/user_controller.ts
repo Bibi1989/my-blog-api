@@ -11,6 +11,9 @@ interface userInterface {
 }
 
 export const createUsers = async (user: userInterface) => {
+  if (!user.username) return { status: "error", error: "Username is empty!!!" };
+  if (!user.email) return { status: "error", error: "Email is empty!!!" };
+  if (!user.password) return { status: "error", error: "Password is empty!!!" };
   const findUser = await User.findOne({
     where: {
       email: user.email,
@@ -52,4 +55,38 @@ export const getUsers = async () => {
   } catch (error) {
     return { status: "error", error };
   }
+};
+
+export const loginUser = async (user: any) => {
+  if (!user.email) return { status: "error", error: "Email is empty!!!" };
+  if (!user.password) return { status: "error", error: "Password is empty!!!" };
+  const findUser = await User.findOne({
+    where: {
+      email: user.email,
+    },
+  });
+  // console.log(findUser);
+  if (!findUser)
+    return { status: "error", error: "Invalid email or your yet to register" };
+  try {
+    const isMatchPassword = await bcrypt.compare(
+      user.password,
+      findUser.dataValues.password
+    );
+    // console.log(findUser.dataValues.password);
+    if (isMatchPassword) {
+      const token = jwt.sign(
+        {
+          id: findUser.dataValues.id,
+          email: findUser.dataValues.email,
+          username: findUser.dataValues.username,
+          image_url: findUser.dataValues.image_url,
+        },
+        process.env.SECRET_KEY
+      );
+      return { status: "success", data: findUser.dataValues, token };
+    } else {
+      return { status: "error", error: "password is invalid" };
+    }
+  } catch (error) {}
 };

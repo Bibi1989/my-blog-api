@@ -18,10 +18,14 @@ exports.createComment = (message, userId, postId) => __awaiter(void 0, void 0, v
         //   userId: id,
         //   postId,
         // });
+        console.log({ message });
         const findPost = yield Post.findOne({ where: { id: postId } });
         if (findPost) {
-            const comments = yield Comment.create(Object.assign(Object.assign({}, message), { userId,
-                postId }));
+            const comments = yield Comment.create({
+                message,
+                userId,
+                postId,
+            });
             return { status: "success", comments };
         }
         return { status: "error", message: "Post not found" };

@@ -9,7 +9,7 @@ interface commentInterface {
 }
 
 export const createComment = async (
-  message: commentInterface,
+  message: string,
   userId: number,
   postId: number
 ) => {
@@ -19,10 +19,12 @@ export const createComment = async (
     //   userId: id,
     //   postId,
     // });
+
+    console.log({ message });
     const findPost = await Post.findOne({ where: { id: postId } });
     if (findPost) {
       const comments = await Comment.create({
-        ...message,
+        message,
         userId,
         postId,
       });

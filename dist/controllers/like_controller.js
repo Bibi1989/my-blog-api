@@ -13,7 +13,7 @@ const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const findPost = yield Like.findOne({ where: { userId, postId } });
+        const findPost = yield Like.findOne({ where: { postId, userId } });
         if (!findPost) {
             const like = yield Like.create({
                 message: `${username} liked your post`,
@@ -23,23 +23,25 @@ exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, voi
             });
             return { status: "success", like };
         }
-        yield Like.destroy({ where: { userId } });
-        return { status: "error", message: "Post not found" };
+        else {
+            yield Like.destroy({ where: { postId, userId } });
+            return { status: "error", message: "Post not found" };
+        }
     }
     catch (error) {
         console.error(error);
         return { status: "error", error };
     }
 });
-exports.getComments = (postId) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getLikes = (postId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const comments = yield Comment.findAll({
+        const likes = yield Like.findAll({
             where: {
                 postId,
             },
             include: [User, Post],
         });
-        return { status: "success", comments };
+        return { status: "success", likes };
     }
     catch (error) {
         return { status: "error", error };
