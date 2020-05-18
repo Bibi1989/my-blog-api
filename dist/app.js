@@ -15,6 +15,7 @@ const app = express_1.default();
 const posts_1 = __importDefault(require("./routes/posts"));
 const comment_1 = __importDefault(require("./routes/comment"));
 const likes_1 = __importDefault(require("./routes/likes"));
+const notification_1 = __importDefault(require("./routes/notification"));
 const users_1 = __importDefault(require("./routes/users"));
 app.use(cors_1.default());
 app.use(morgan_1.default("dev"));
@@ -25,6 +26,7 @@ app.use(cookie_parser_1.default());
 app.use("/api/v1/posts", posts_1.default);
 app.use("/api/v1/comments", comment_1.default);
 app.use("/api/v1/likes", likes_1.default);
+app.use("/api/v1/notices", notification_1.default);
 app.use("/auth/v1", users_1.default);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
