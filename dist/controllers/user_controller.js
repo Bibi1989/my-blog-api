@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const models = require("../../database/models/");
-const { User, Post } = models;
+const { User, Post, Comment, Like } = models;
 exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
     if (!user.username)
         return { status: "error", error: "Username is empty!!!" };
@@ -55,6 +55,18 @@ exports.getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
             include: [Post],
         });
         return { status: "success", data: users };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User.findOne({
+            where: { id },
+            include: [Post, Comment, Like],
+        });
+        return { status: "success", data: user };
     }
     catch (error) {
         return { status: "error", error };

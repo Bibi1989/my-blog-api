@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
+    User.hasMany(models.Like, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
     User.hasMany(models.Notification, {
       foreignKey: "userId",
       onDelete: "CASCADE",

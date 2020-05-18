@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 const models = require("../../database/models/");
-const { User, Post } = models;
+const { User, Post, Comment, Like } = models;
 
 interface userInterface {
   username: string;
@@ -52,6 +52,17 @@ export const getUsers = async () => {
       include: [Post],
     });
     return { status: "success", data: users };
+  } catch (error) {
+    return { status: "error", error };
+  }
+};
+export const getUser = async (id: number) => {
+  try {
+    const user = await User.findOne({
+      where: { id },
+      include: [Post, Comment, Like],
+    });
+    return { status: "success", data: user };
   } catch (error) {
     return { status: "error", error };
   }
