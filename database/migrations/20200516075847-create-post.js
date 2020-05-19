@@ -17,6 +17,9 @@ module.exports = {
       message: {
         type: Sequelize.TEXT("long"),
       },
+      image_url: {
+        type: Sequelize.TEXT("long"),
+      },
       tags: {
         type: Sequelize.STRING,
         defaultValue: "post",

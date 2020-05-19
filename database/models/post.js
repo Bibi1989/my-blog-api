@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       tags: DataTypes.STRING,
       track: DataTypes.BOOLEAN,
       username: DataTypes.STRING,
+      image_url: DataTypes.STRING,
       userId: DataTypes.INTEGER,
     },
     {}
