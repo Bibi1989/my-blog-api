@@ -35,4 +35,17 @@ exports.getNotifications = (userId) => __awaiter(void 0, void 0, void 0, functio
         return { status: "error", error };
     }
 });
+exports.deleteNotification = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const notices = yield Notification.destroy({
+            where: {
+                id,
+            },
+        });
+        return { status: "success", notices };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
 //# sourceMappingURL=notification_controller.js.map

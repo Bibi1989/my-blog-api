@@ -27,5 +27,10 @@ router.get("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, 
     const notices = yield notification_controller_1.getNotifications(Number(id));
     res.json({ data: notices });
 }));
+router.delete("/:id", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const deleted = yield notification_controller_1.deleteNotification(Number(id));
+    res.json({ data: deleted });
+}));
 exports.default = router;
 //# sourceMappingURL=notification.js.map

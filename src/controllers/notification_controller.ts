@@ -32,3 +32,15 @@ export const getNotifications = async (userId: number) => {
     return { status: "error", error };
   }
 };
+export const deleteNotification = async (id: number) => {
+  try {
+    const notices = await Notification.destroy({
+      where: {
+        id,
+      },
+    });
+    return { status: "success", notices };
+  } catch (error) {
+    return { status: "error", error };
+  }
+};

@@ -23,6 +23,8 @@ router.post("/", authenticate, async (req: any, res) => {
   const body = req.body;
   const { id, username } = req.user;
 
+  console.log(body);
+
   if (!body.title)
     return res.json({ status: "error", error: "Title field is empty!!!" });
   if (!body.message)

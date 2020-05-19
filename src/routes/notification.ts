@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getNotifications,
   createNotification,
+  deleteNotification,
 } from "../controllers/notification_controller";
 import authenticate from "./auth";
 
@@ -18,6 +19,11 @@ router.get("/", authenticate, async (req: any, res) => {
   const { id } = req.user;
   const notices = await getNotifications(Number(id));
   res.json({ data: notices });
+});
+router.delete("/:id", authenticate, async (req: any, res) => {
+  const { id } = req.params;
+  const deleted = await deleteNotification(Number(id));
+  res.json({ data: deleted });
 });
 
 export default router;
