@@ -21,7 +21,7 @@ router.get("/:postId", authenticate, async (req, res) => {
 
 router.post("/", authenticate, async (req: any, res) => {
   const body = req.body;
-  const { id, username } = req.user;
+  const { id, username, image_url } = req.user;
 
   console.log(body);
 
@@ -29,7 +29,7 @@ router.post("/", authenticate, async (req: any, res) => {
     return res.json({ status: "error", error: "Title field is empty!!!" });
   if (!body.message)
     return res.json({ status: "error", error: "Message field is empty!!!" });
-  const post = await createPost(body, id, username);
+  const post = await createPost(body, id, username, image_url);
   res.json({ data: post });
 });
 

@@ -6,6 +6,7 @@ interface postInterface {
   id?: string;
   title: string;
   message: string;
+  image_url?: string;
   tags?: string;
   track?: boolean;
   userId: number;
@@ -15,12 +16,14 @@ interface postInterface {
 export const createPost = async (
   post: postInterface,
   id: number,
-  username: string
+  username: string,
+  image_url: string
 ) => {
   try {
     const posts = await Post.create({
       ...post,
       username,
+      image_url,
       userId: Number(id),
     });
     return { status: "success", data: posts };

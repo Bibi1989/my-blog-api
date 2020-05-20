@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
-exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createPost = (post, id, username, image_url) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield Post.create(Object.assign(Object.assign({}, post), { username, userId: Number(id) }));
+        const posts = yield Post.create(Object.assign(Object.assign({}, post), { username,
+            image_url, userId: Number(id) }));
         return { status: "success", data: posts };
     }
     catch (error) {

@@ -27,13 +27,13 @@ router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, v
 }));
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const { id, username } = req.user;
+    const { id, username, image_url } = req.user;
     console.log(body);
     if (!body.title)
         return res.json({ status: "error", error: "Title field is empty!!!" });
     if (!body.message)
         return res.json({ status: "error", error: "Message field is empty!!!" });
-    const post = yield post_controller_1.createPost(body, id, username);
+    const post = yield post_controller_1.createPost(body, id, username, image_url);
     res.json({ data: post });
 }));
 router.patch("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
