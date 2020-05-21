@@ -27,7 +27,7 @@ router.get("/:postId", authenticate, async (req, res) => {
   const posts = await getAPost(Number(postId));
   res.json({ data: posts });
 });
-router.get("/users", authenticate, async (req: any, res) => {
+router.get("/post/users", authenticate, async (req: any, res) => {
   const { id } = req.user;
   const posts = await getUsersPost(Number(id));
   res.json({ data: posts });
