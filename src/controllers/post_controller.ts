@@ -54,6 +54,17 @@ export const getAPost = async (id: number) => {
     return { status: "error", error };
   }
 };
+export const getUsersPost = async (id: number) => {
+  try {
+    const post = await Post.findAll({
+      where: { userId: id },
+      include: [User, Comment, Like],
+    });
+    return { status: "success", data: post };
+  } catch (error) {
+    return { status: "error", error };
+  }
+};
 export const updatePost = async (
   post: postInterface,
   title: string,
@@ -73,6 +84,19 @@ export const updatePost = async (
       );
     }
     return { status: "success", data: post };
+  } catch (error) {
+    return { status: "error", error };
+  }
+};
+export const deletePost = async (id: number) => {
+  const findPost = await Post.findOne({
+    where: { id },
+  });
+  try {
+    if (findPost) {
+      await Post.destroy({ where: { id } });
+    }
+    return { status: "success", data: "Post deleted!!!" };
   } catch (error) {
     return { status: "error", error };
   }

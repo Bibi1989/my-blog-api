@@ -1,13 +1,22 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import {
   getPosts,
   getAPost,
   createPost,
   updatePost,
+  getUsersPost,
+  deletePost,
 } from "../controllers/post_controller";
 import authenticate from "./auth";
 
 const router = Router();
+
+interface AuthInterface {
+  username: string;
+  email: string;
+  id: number;
+  image_url?: string;
+}
 
 router.get("/", async (req, res) => {
   const posts = await getPosts();
@@ -16,6 +25,11 @@ router.get("/", async (req, res) => {
 router.get("/:postId", authenticate, async (req, res) => {
   const { postId } = req.params;
   const posts = await getAPost(Number(postId));
+  res.json({ data: posts });
+});
+router.get("/users", authenticate, async (req: any, res) => {
+  const { id } = req.user;
+  const posts = await getUsersPost(Number(id));
   res.json({ data: posts });
 });
 
@@ -43,6 +57,11 @@ router.patch("/", authenticate, async (req: any, res) => {
     username,
   };
   const post = await updatePost(new_update, title, message);
+  res.json({ data: post });
+});
+router.delete("/:id", authenticate, async (req: any, res) => {
+  const { id } = req.params;
+  const post = await deletePost(Number(id));
   res.json({ data: post });
 });
 

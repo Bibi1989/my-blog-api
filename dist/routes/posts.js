@@ -25,6 +25,11 @@ router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, v
     const posts = yield post_controller_1.getAPost(Number(postId));
     res.json({ data: posts });
 }));
+router.get("/users", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const posts = yield post_controller_1.getUsersPost(Number(id));
+    res.json({ data: posts });
+}));
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id, username, image_url } = req.user;
@@ -42,6 +47,11 @@ router.patch("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0
     const { id, username } = req.user;
     const new_update = Object.assign(Object.assign({}, update), { userId: id, username });
     const post = yield post_controller_1.updatePost(new_update, title, message);
+    res.json({ data: post });
+}));
+router.delete("/:id", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const post = yield post_controller_1.deletePost(Number(id));
     res.json({ data: post });
 }));
 exports.default = router;

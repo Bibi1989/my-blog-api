@@ -45,6 +45,18 @@ exports.getAPost = (id) => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "error", error };
     }
 });
+exports.getUsersPost = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post.findAll({
+            where: { userId: id },
+            include: [User, Comment, Like],
+        });
+        return { status: "success", data: post };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
 exports.updatePost = (post, title, message) => __awaiter(void 0, void 0, void 0, function* () {
     const findPost = yield Post.findOne({
         where: { id: post.id },
@@ -56,6 +68,20 @@ exports.updatePost = (post, title, message) => __awaiter(void 0, void 0, void 0,
             });
         }
         return { status: "success", data: post };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.deletePost = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const findPost = yield Post.findOne({
+        where: { id },
+    });
+    try {
+        if (findPost) {
+            yield Post.destroy({ where: { id } });
+        }
+        return { status: "success", data: "Post deleted!!!" };
     }
     catch (error) {
         return { status: "error", error };
