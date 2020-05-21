@@ -38,9 +38,10 @@ router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0,
 }));
 router.patch("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const update = req.body;
+    const { title, message } = req.body;
     const { id, username } = req.user;
     const new_update = Object.assign(Object.assign({}, update), { userId: id, username });
-    const post = yield post_controller_1.updatePost(new_update);
+    const post = yield post_controller_1.updatePost(new_update, title, message);
     res.json({ data: post });
 }));
 exports.default = router;

@@ -28,8 +28,8 @@ router.get("/users", (_req, res) => __awaiter(void 0, void 0, void 0, function* 
     const users = yield user_controller_1.getUsers();
     res.json({ data: users });
 }));
-router.get("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
+router.get("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
     const user = yield user_controller_1.getUser(Number(id));
     res.json({ data: user });
 }));

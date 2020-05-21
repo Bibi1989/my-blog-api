@@ -54,14 +54,18 @@ export const getAPost = async (id: number) => {
     return { status: "error", error };
   }
 };
-export const updatePost = async (post: postInterface) => {
+export const updatePost = async (
+  post: postInterface,
+  title: string,
+  message: string
+) => {
   const findPost = await Post.findOne({
     where: { id: post.id },
   });
   try {
     if (findPost) {
       await Post.update(
-        post,
+        { ...post, title, message },
         { where: { id: post.id } },
         {
           include: [User, Comment, Like],

@@ -35,13 +35,14 @@ router.post("/", authenticate, async (req: any, res) => {
 
 router.patch("/", authenticate, async (req: any, res) => {
   const update = req.body;
+  const { title, message } = req.body;
   const { id, username } = req.user;
   const new_update = {
     ...update,
     userId: id,
     username,
   };
-  const post = await updatePost(new_update);
+  const post = await updatePost(new_update, title, message);
   res.json({ data: post });
 });
 

@@ -45,13 +45,13 @@ exports.getAPost = (id) => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "error", error };
     }
 });
-exports.updatePost = (post) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updatePost = (post, title, message) => __awaiter(void 0, void 0, void 0, function* () {
     const findPost = yield Post.findOne({
         where: { id: post.id },
     });
     try {
         if (findPost) {
-            yield Post.update(post, { where: { id: post.id } }, {
+            yield Post.update(Object.assign(Object.assign({}, post), { title, message }), { where: { id: post.id } }, {
                 include: [User, Comment, Like],
             });
         }
