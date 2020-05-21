@@ -20,12 +20,12 @@ router.post("/login", async (req, res) => {
   res.header("auth", user.token);
   res.json({ data: user });
 });
-router.get("/users", async (_req, res) => {
+router.get("/", async (_req, res) => {
   const users = await getUsers();
   res.json({ data: users });
 });
-router.get("/users/:id", async (req, res) => {
-  const { id } = req.params;
+router.get("/users/", async (req: any, res) => {
+  const { id } = req.user;
   const user = await getUser(Number(id));
   res.json({ data: user });
 });
