@@ -24,8 +24,8 @@ router.get("/users", async (_req, res) => {
   const users = await getUsers();
   res.json({ data: users });
 });
-router.get("/users", async (req: any, res) => {
-  const { id } = req.user;
+router.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
   const user = await getUser(Number(id));
   res.json({ data: user });
 });
