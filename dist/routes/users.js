@@ -8,13 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const user_controller_1 = require("../controllers/user_controller");
-const auth_1 = __importDefault(require("./auth"));
 const router = express_1.Router();
 router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -32,8 +28,8 @@ router.get("/", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_controller_1.getUsers();
     res.json({ data: users });
 }));
-router.get("/users", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.user;
+router.get("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
     const user = yield user_controller_1.getUser(Number(id));
     res.json({ data: user });
 }));

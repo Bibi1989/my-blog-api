@@ -5,7 +5,6 @@ import {
   loginUser,
   getUser,
 } from "../controllers/user_controller";
-import authenticate from "./auth";
 
 const router = Router();
 
@@ -25,8 +24,8 @@ router.get("/", async (_req, res) => {
   const users = await getUsers();
   res.json({ data: users });
 });
-router.get("/users", authenticate, async (req: any, res) => {
-  const { id } = req.user;
+router.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
   const user = await getUser(Number(id));
   res.json({ data: user });
 });
