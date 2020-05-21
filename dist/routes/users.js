@@ -24,7 +24,7 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     res.header("auth", user.token);
     res.json({ data: user });
 }));
-router.get("/", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/users", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_controller_1.getUsers();
     res.json({ data: users });
 }));

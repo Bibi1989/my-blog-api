@@ -20,7 +20,7 @@ router.post("/login", async (req, res) => {
   res.header("auth", user.token);
   res.json({ data: user });
 });
-router.get("/", async (_req, res) => {
+router.get("/users", async (_req, res) => {
   const users = await getUsers();
   res.json({ data: users });
 });
