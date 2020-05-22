@@ -15,7 +15,11 @@ exports.createPost = (post, id, username, image_url) => __awaiter(void 0, void 0
     try {
         const posts = yield Post.create(Object.assign(Object.assign({}, post), { username,
             image_url, userId: Number(id) }));
-        return { status: "success", data: posts };
+        const findPost = yield Post.findOne({
+            where: { id: posts.id },
+            include: [User, Comment, Like],
+        });
+        return { status: "success", data: findPost };
     }
     catch (error) {
         console.error(error);

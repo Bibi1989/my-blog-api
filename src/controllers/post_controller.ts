@@ -26,7 +26,11 @@ export const createPost = async (
       image_url,
       userId: Number(id),
     });
-    return { status: "success", data: posts };
+    const findPost = await Post.findOne({
+      where: { id: posts.id },
+      include: [User, Comment, Like],
+    });
+    return { status: "success", data: findPost };
   } catch (error) {
     console.error(error);
     return { status: "error", error };
