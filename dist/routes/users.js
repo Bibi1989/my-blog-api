@@ -33,5 +33,10 @@ router.get("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, functio
     const user = yield user_controller_1.getUser(Number(id));
     res.json({ data: user });
 }));
+router.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const user = yield user_controller_1.deleteUser(Number(id));
+    res.json({ data: user });
+}));
 exports.default = router;
 //# sourceMappingURL=users.js.map

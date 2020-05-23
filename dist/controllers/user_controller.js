@@ -101,4 +101,13 @@ exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) { }
 });
+exports.deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield User.destroy({ where: { id } });
+        return { status: "success", data: "User deactivated!!!" };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
 //# sourceMappingURL=user_controller.js.map

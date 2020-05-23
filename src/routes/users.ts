@@ -4,6 +4,7 @@ import {
   getUsers,
   loginUser,
   getUser,
+  deleteUser,
 } from "../controllers/user_controller";
 
 const router = Router();
@@ -27,6 +28,11 @@ router.get("/users", async (_req, res) => {
 router.get("/users/:id", async (req, res) => {
   const { id } = req.params;
   const user = await getUser(Number(id));
+  res.json({ data: user });
+});
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const user = await deleteUser(Number(id));
   res.json({ data: user });
 });
 

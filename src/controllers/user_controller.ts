@@ -99,3 +99,12 @@ export const loginUser = async (user: any) => {
     }
   } catch (error) {}
 };
+
+export const deleteUser = async (id: number) => {
+  try {
+    await User.destroy({ where: { id } });
+    return { status: "success", data: "User deactivated!!!" };
+  } catch (error) {
+    return { status: "error", error };
+  }
+};
