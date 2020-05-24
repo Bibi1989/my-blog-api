@@ -35,7 +35,7 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
         const salt = yield bcryptjs_1.default.genSaltSync(10);
         const hashedPassword = yield bcryptjs_1.default.hash(user.password, salt);
         console.log(hashedPassword);
-        const users = yield User.create(Object.assign(Object.assign({}, user), { password: hashedPassword }));
+        const users = yield User.create(Object.assign(Object.assign({}, user), { image_url: user.image_url == "[]" ? null : user.image_url, password: hashedPassword }));
         const token = jsonwebtoken_1.default.sign({
             id: users.id,
             email: users.email,
