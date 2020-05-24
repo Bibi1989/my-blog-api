@@ -28,7 +28,6 @@ export const createUsers = async (user: userInterface) => {
     console.log(hashedPassword);
     const users = await User.create({
       ...user,
-      image_url: user.image_url == "[]" ? null : user.image_url,
       password: hashedPassword,
     });
     const token = jwt.sign(
