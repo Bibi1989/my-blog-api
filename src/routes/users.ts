@@ -9,10 +9,18 @@ import {
   updateUser,
   getToken,
   changePassword,
+  addUserPhoto,
 } from "../controllers/user_controller";
 import authenticate from "./auth";
+import { v2 } from "cloudinary";
 
 const router = Router();
+
+v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 router.post("/register", async (req, res) => {
   const body = req.body;
@@ -62,14 +70,25 @@ router.get("/resetpassword/:token", async (req, res) => {
   // res.redirect(`http://localhost:3000/forgotpassword/${token}`);
   res.redirect(`https://bibiblog.netlify.app/forgotpassword/${token}`);
 });
+
 router.patch("/", authenticate, async (req: any, res) => {
   const { id } = req.user;
-  const user = await updateUser(Number(id), req.body, req);
+  const user = await updateUser(Number(id), req.body);
   if (user.status === "error") {
     return res.status(user.statusCode).json({ error: user.error });
   }
   res.json(user);
 });
+
+router.patch("/photo", authenticate, async (req: any, res) => {
+  const { id } = req.user;
+  const user = await addUserPhoto(Number(id), req);
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
+  res.json(user);
+});
+
 router.patch("/resetpassword/:token", async (req, res) => {
   const { token } = req.params;
   const user = await changePassword(req.body, token);

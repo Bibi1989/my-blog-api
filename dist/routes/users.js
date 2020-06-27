@@ -15,7 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const user_controller_1 = require("../controllers/user_controller");
 const auth_1 = __importDefault(require("./auth"));
+const cloudinary_1 = require("cloudinary");
 const router = express_1.Router();
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const user = yield user_controller_1.createUsers(body);
@@ -65,7 +71,15 @@ router.get("/resetpassword/:token", (req, res) => __awaiter(void 0, void 0, void
 }));
 router.patch("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.user;
-    const user = yield user_controller_1.updateUser(Number(id), req.body, req);
+    const user = yield user_controller_1.updateUser(Number(id), req.body);
+    if (user.status === "error") {
+        return res.status(user.statusCode).json({ error: user.error });
+    }
+    res.json(user);
+}));
+router.patch("/photo", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const user = yield user_controller_1.addUserPhoto(Number(id), req);
     if (user.status === "error") {
         return res.status(user.statusCode).json({ error: user.error });
     }

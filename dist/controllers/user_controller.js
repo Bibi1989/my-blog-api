@@ -21,6 +21,11 @@ const fullname_1 = require("../utils/fullname");
 const cloudinary_1 = require("cloudinary");
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
     let errors = {
         firstname: "",
@@ -135,37 +140,46 @@ exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "error", statusCode: 400, error };
     }
 });
-exports.updateUser = (id, body, req) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateUser = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let user = yield User.findOne({ where: { id } });
-        console.log(body);
         if (!user)
             return {
                 status: "error",
                 statusCode: 404,
                 error: `User with this ID: ${id} not found`,
             };
-        if (body.username) {
-            yield User.update(body, { where: { id } });
-            return { status: "success", data: "User updated successfully!!!" };
-        }
-        let file = req.files.file;
-        if (file) {
-            let fileImage = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, {
-                folder: "blog",
-                transformation: [{ width: 500, height: 350, crop: "fill" }],
-            }, (err, result) => {
-                if (err) {
-                    console.log(err);
-                }
-                return result;
-            });
-            yield User.update({ image_url: fileImage.secure_url }, { where: { id } });
-            return { status: "success", data: "User updated successfully!!!" };
-        }
+        yield User.update(body, { where: { id } });
+        return { status: "success", data: "User updated successfully!!!" };
     }
     catch (error) {
         return { status: "error", statusCode: 400, error };
+    }
+});
+exports.addUserPhoto = (id, req) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User.findOne({ where: { id } });
+        if (!user)
+            return {
+                status: "error",
+                statusCode: 404,
+                error: `User with this ID: ${id} not found`,
+            };
+        let file = req.files.file;
+        let fileImage = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, {
+            folder: "blog",
+            transformation: [{ width: 500, height: 350, crop: "fill" }],
+        }, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            return result;
+        });
+        yield User.update({ image_url: fileImage.secure_url }, { where: { id } });
+        return { status: "success", data: "User Photo updated successfully!!!" };
+    }
+    catch (error) {
+        return { status: "success", statusCode: 400, error };
     }
 });
 exports.deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {

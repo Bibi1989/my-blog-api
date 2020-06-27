@@ -18,6 +18,12 @@ interface userInterface {
   image_url?: string;
 }
 
+v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 export const createUsers = async (user: userInterface) => {
   let errors = {
     firstname: "",
@@ -143,10 +149,9 @@ export const loginUser = async (user: any) => {
   }
 };
 
-export const updateUser = async (id: number, body: any, req: any) => {
+export const updateUser = async (id: number, body: any) => {
   try {
     let user = await User.findOne({ where: { id } });
-    console.log(body);
     if (!user)
       return {
         status: "error",
@@ -154,32 +159,42 @@ export const updateUser = async (id: number, body: any, req: any) => {
         error: `User with this ID: ${id} not found`,
       };
 
-    if (body.username) {
-      await User.update(body, { where: { id } });
-      return { status: "success", data: "User updated successfully!!!" };
-    }
-
-    let file = req.files.file;
-
-    if (file) {
-      let fileImage = await v2.uploader.upload(
-        file.tempFilePath,
-        {
-          folder: "blog",
-          transformation: [{ width: 500, height: 350, crop: "fill" }],
-        },
-        (err: Error, result: any) => {
-          if (err) {
-            console.log(err);
-          }
-          return result;
-        }
-      );
-      await User.update({ image_url: fileImage.secure_url }, { where: { id } });
-      return { status: "success", data: "User updated successfully!!!" };
-    }
+    await User.update(body, { where: { id } });
+    return { status: "success", data: "User updated successfully!!!" };
   } catch (error) {
     return { status: "error", statusCode: 400, error };
+  }
+};
+
+export const addUserPhoto = async (id: number, req: any) => {
+  try {
+    const user = await User.findOne({ where: { id } });
+
+    if (!user)
+      return {
+        status: "error",
+        statusCode: 404,
+        error: `User with this ID: ${id} not found`,
+      };
+
+    let file = req.files.file;
+    let fileImage = await v2.uploader.upload(
+      file.tempFilePath,
+      {
+        folder: "blog",
+        transformation: [{ width: 500, height: 350, crop: "fill" }],
+      },
+      (err: Error, result: any) => {
+        if (err) {
+          console.log(err);
+        }
+        return result;
+      }
+    );
+    await User.update({ image_url: fileImage.secure_url }, { where: { id } });
+    return { status: "success", data: "User Photo updated successfully!!!" };
+  } catch (error) {
+    return { status: "success", statusCode: 400, error };
   }
 };
 
