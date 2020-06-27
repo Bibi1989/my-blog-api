@@ -72,7 +72,6 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "success", data: users, token };
     }
     catch (error) {
-        console.error(error);
         return { status: "error", statusCode: 400, error };
     }
 });

@@ -75,7 +75,6 @@ export const createUsers = async (user: userInterface) => {
     );
     return { status: "success", data: users, token };
   } catch (error) {
-    console.error(error);
     return { status: "error", statusCode: 400, error };
   }
 };
