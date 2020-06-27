@@ -3,10 +3,15 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail";
 import { Op } from "sequelize";
+import { fullname } from "../utils/fullname";
+import { v2 } from "cloudinary";
+
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 
 interface userInterface {
+  firstname: string;
+  lastname: string;
   username: string;
   email: string;
   password: string;
@@ -14,9 +19,25 @@ interface userInterface {
 }
 
 export const createUsers = async (user: userInterface) => {
-  if (!user.username) return { status: "error", error: "Username is empty!!!" };
-  if (!user.email) return { status: "error", error: "Email is empty!!!" };
-  if (!user.password) return { status: "error", error: "Password is empty!!!" };
+  let errors = {
+    firstname: "",
+    lastname: "",
+    username: "",
+    email: "",
+    password: "",
+  };
+
+  if (!user.firstname) errors.firstname = "First Name is empty!!!";
+  if (!user.lastname) errors.lastname = "Last Name is empty!!!";
+  if (!user.username) errors.username = "Username is empty!!!";
+  if (!user.email) errors.email = "Email is empty!!!";
+  if (!user.password) errors.password = "Password is empty!!!";
+
+  if (errors.username || errors.email || errors.password)
+    return { status: "error", statusCode: 404, error: errors };
+
+  const userFullname = fullname(user.firstname, user.lastname);
+
   const findUser = await User.findOne({
     where: {
       email: user.email,
@@ -24,12 +45,17 @@ export const createUsers = async (user: userInterface) => {
   });
   try {
     if (findUser) {
-      return { status: "error", error: "User with this email exist" };
+      return {
+        status: "error",
+        statusCode: 404,
+        error: "User with this email exist",
+      };
     }
     const salt = await bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(user.password, salt);
     const users = await User.create({
       ...user,
+      fullname: userFullname,
       password: hashedPassword,
     });
     const token = jwt.sign(
@@ -44,7 +70,7 @@ export const createUsers = async (user: userInterface) => {
     return { status: "success", data: users, token };
   } catch (error) {
     console.error(error);
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 
@@ -55,7 +81,7 @@ export const getUsers = async () => {
     });
     return { status: "success", data: users };
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 export const getUser = async (id: number) => {
@@ -66,20 +92,33 @@ export const getUser = async (id: number) => {
     });
     return { status: "success", data: user };
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 
 export const loginUser = async (user: any) => {
-  if (!user.email) return { status: "error", error: "Email is empty!!!" };
-  if (!user.password) return { status: "error", error: "Password is empty!!!" };
+  let errors = {
+    email: "",
+    password: "",
+  };
+
+  if (!user.email) errors.email = "Email is empty!!!";
+  if (!user.password) errors.password = "Password is empty!!!";
+
+  if (errors.email || errors.password)
+    return { status: "error", statusCode: 404, error: errors };
+
   const findUser = await User.findOne({
     where: {
       email: user.email,
     },
   });
   if (!findUser)
-    return { status: "error", error: "Invalid email or your yet to register" };
+    return {
+      status: "error",
+      statusCode: 404,
+      error: "Invalid email or your yet to register",
+    };
   try {
     const isMatchPassword = await bcrypt.compare(
       user.password,
@@ -97,30 +136,64 @@ export const loginUser = async (user: any) => {
       );
       return { status: "success", data: findUser.dataValues, token };
     } else {
-      return { status: "error", error: "password is invalid" };
+      return { status: "error", statusCode: 404, error: "password is invalid" };
     }
-  } catch (error) {}
+  } catch (error) {
+    return { status: "error", statusCode: 400, error };
+  }
 };
 
-export const updateUser = async (id: number, body: any) => {
-  console.log(body);
+export const updateUser = async (id: number, body: any, req: any) => {
   try {
     let user = await User.findOne({ where: { id } });
-    if (!user) return { status: "error", error: "User not found" };
+    console.log(body);
+    if (!user)
+      return {
+        status: "error",
+        statusCode: 404,
+        error: `User with this ID: ${id} not found`,
+      };
 
-    await User.update(body, { where: { id } });
-    return { status: "success", data: "User updated successfully!!!" };
+    if (body.username) {
+      await User.update(body, { where: { id } });
+      return { status: "success", data: "User updated successfully!!!" };
+    }
+
+    let file = req.files.file;
+
+    if (file) {
+      let fileImage = await v2.uploader.upload(
+        file.tempFilePath,
+        { folder: "blog" },
+        (err: Error, result: any) => {
+          if (err) {
+            console.log(err);
+          }
+          return result;
+        }
+      );
+      await User.update({ image_url: fileImage.secure_url }, { where: { id } });
+      return { status: "success", data: "User updated successfully!!!" };
+    }
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 
 export const deleteUser = async (id: number) => {
   try {
+    const user = await User.findOne({ where: { id } });
+    if (!user) {
+      return {
+        status: "error",
+        statusCode: 404,
+        error: `User with this ID: ${id} not found`,
+      };
+    }
     await User.destroy({ where: { id } });
     return { status: "success", data: "User deactivated!!!" };
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 
@@ -128,7 +201,11 @@ export const resetPassword = async (email: any, req: any) => {
   const user = await User.findOne({ where: { email } });
   try {
     if (!user) {
-      return { status: "error", error: "User with this email not found" };
+      return {
+        status: "error",
+        statusCode: 404,
+        error: "User with this email not found",
+      };
     }
 
     let resetToken = crypto.randomBytes(20).toString("hex");
@@ -162,7 +239,7 @@ export const resetPassword = async (email: any, req: any) => {
     );
     return { status: "success", data: user };
   } catch (error) {
-    return { status: "error", error: error };
+    return { status: "error", statusCode: 400, error: error };
   }
 };
 
@@ -182,12 +259,12 @@ export const getToken = async (token: string) => {
     });
 
     if (!user) {
-      return { status: "error", error: "User not found" };
+      return { status: "error", statusCode: 404, error: "User not found" };
     }
 
     return { status: "success", id: user.id };
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };
 
@@ -205,11 +282,15 @@ export const changePassword = async (password: any, token: string) => {
     });
 
     if (!user) {
-      return { status: "error", error: "User not found" };
+      return { status: "error", statusCode: 404, error: "User not found" };
     }
 
     if (!password) {
-      return { status: "error", error: "No password provided" };
+      return {
+        status: "error",
+        statusCode: 404,
+        error: "No password provided",
+      };
     }
     const salt = await bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(password.password, salt);
@@ -225,6 +306,6 @@ export const changePassword = async (password: any, token: string) => {
     });
     return { status: "success", data: "Password changed" };
   } catch (error) {
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
   }
 };

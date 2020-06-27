@@ -9,12 +9,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cloudinary_1 = require("cloudinary");
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
-exports.createPost = (post, id, username, image_url) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield Post.create(Object.assign(Object.assign({}, post), { username,
-            image_url, userId: Number(id) }));
+        let errors = {
+            title: "",
+            message: "",
+        };
+        if (!post.title) {
+            errors.title = "Title is required";
+        }
+        if (!post.message) {
+            errors.message = "Message Body is required";
+        }
+        if (errors.title || errors.message) {
+            return { status: "error", statusCode: 404, error: errors };
+        }
+        const check = yield Post.findOne({
+            where: {
+                title: post.title,
+                userId: id,
+            },
+        });
+        if (check) {
+            return {
+                status: "error",
+                statusCode: 404,
+                error: "You have used this title already",
+            };
+        }
+        const posts = yield Post.create(Object.assign(Object.assign({}, post), { username, userId: Number(id) }));
         const findPost = yield Post.findOne({
             where: { id: posts.id },
             include: [User, Comment, Like],
@@ -23,7 +49,22 @@ exports.createPost = (post, id, username, image_url) => __awaiter(void 0, void 0
     }
     catch (error) {
         console.error(error);
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
+    }
+});
+exports.postImage = (form, id, req) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const img = yield cloudinary_1.v2.uploader.upload(req.files.image.tempFilePath, { folder: "blog" }, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            return result;
+        });
+        const posts = yield Post.create(Object.assign(Object.assign({}, form), { image_url: img.secure_url, userId: Number(id) }));
+        return { status: "success", data: posts };
+    }
+    catch (error) {
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.getPosts = () => __awaiter(void 0, void 0, void 0, function* () {

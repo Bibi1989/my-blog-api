@@ -8,6 +8,7 @@ const http_errors_1 = __importDefault(require("http-errors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = express_1.default();
@@ -22,6 +23,7 @@ app.use(morgan_1.default("dev"));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cookie_parser_1.default());
+app.use(express_fileupload_1.default({ useTempFiles: true }));
 // routes
 app.use("/api/v1/posts", posts_1.default);
 app.use("/api/v1/comments", comment_1.default);

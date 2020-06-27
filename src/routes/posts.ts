@@ -6,8 +6,10 @@ import {
   updatePost,
   getUsersPost,
   deletePost,
+  postImage,
 } from "../controllers/post_controller";
 import authenticate from "./auth";
+import { v2 } from "cloudinary";
 
 const router = Router();
 
@@ -17,6 +19,12 @@ interface AuthInterface {
   id: number;
   image_url?: string;
 }
+
+v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 router.get("/", async (req, res) => {
   const posts = await getPosts();
@@ -35,16 +43,26 @@ router.get("/post/users", authenticate, async (req: any, res) => {
 
 router.post("/", authenticate, async (req: any, res) => {
   const body = req.body;
-  const { id, username, image_url } = req.user;
+  const { id, username } = req.user;
 
-  console.log(image_url);
+  const post = await createPost(body, id, username);
 
-  if (!body.title)
-    return res.json({ status: "error", error: "Title field is empty!!!" });
-  if (!body.message)
-    return res.json({ status: "error", error: "Message field is empty!!!" });
-  const post = await createPost(body, id, username, image_url);
-  res.json({ data: post });
+  if (post.status === "error") {
+    return res.status(post.statusCode).json({ error: post.error });
+  }
+  res.json(post);
+});
+
+router.post("/photo", authenticate, async (req: any, res) => {
+  const body = req.body;
+  const { id, username } = req.user;
+
+  const post = await postImage(body, id, req);
+
+  if (post.status === "error") {
+    return res.status(post.statusCode).json({ error: post.error });
+  }
+  res.json(post);
 });
 
 router.patch("/", authenticate, async (req: any, res) => {

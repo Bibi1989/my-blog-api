@@ -3,6 +3,7 @@ import createError, { HttpError } from "http-errors";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import dotenv from "dotenv";
+import fileupload from "express-fileupload";
 import cors from "cors";
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(fileupload({ useTempFiles: true }));
 
 // routes
 app.use("/api/v1/posts", postRoute);

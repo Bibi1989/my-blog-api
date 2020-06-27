@@ -1,3 +1,4 @@
+import { v2 } from "cloudinary";
 const models = require("../../database/models/");
 
 const { User, Post, Comment, Like } = models;
@@ -16,14 +17,42 @@ interface postInterface {
 export const createPost = async (
   post: postInterface,
   id: number,
-  username: string,
-  image_url: string
+  username: string
 ) => {
   try {
+    let errors = {
+      title: "",
+      message: "",
+    };
+    if (!post.title) {
+      errors.title = "Title is required";
+    }
+    if (!post.message) {
+      errors.message = "Message Body is required";
+    }
+
+    if (errors.title || errors.message) {
+      return { status: "error", statusCode: 404, error: errors };
+    }
+
+    const check = await Post.findOne({
+      where: {
+        title: post.title,
+        userId: id,
+      },
+    });
+
+    if (check) {
+      return {
+        status: "error",
+        statusCode: 404,
+        error: "You have used this title already",
+      };
+    }
+
     const posts = await Post.create({
       ...post,
       username,
-      image_url,
       userId: Number(id),
     });
     const findPost = await Post.findOne({
@@ -33,7 +62,32 @@ export const createPost = async (
     return { status: "success", data: findPost };
   } catch (error) {
     console.error(error);
-    return { status: "error", error };
+    return { status: "error", statusCode: 400, error };
+  }
+};
+
+export const postImage = async (form: any, id: number, req: any) => {
+  try {
+    const img = await v2.uploader.upload(
+      req.files.image.tempFilePath,
+      { folder: "blog" },
+      (err: Error, result: any) => {
+        if (err) {
+          console.log(err);
+        }
+        return result;
+      }
+    );
+
+    const posts = await Post.create({
+      ...form,
+      image_url: img.secure_url,
+      userId: Number(id),
+    });
+
+    return { status: "success", data: posts };
+  } catch (error) {
+    return { status: "error", statusCode: 400, error };
   }
 };
 

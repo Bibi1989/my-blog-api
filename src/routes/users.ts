@@ -10,20 +10,27 @@ import {
   getToken,
   changePassword,
 } from "../controllers/user_controller";
+import authenticate from "./auth";
 
 const router = Router();
 
 router.post("/register", async (req, res) => {
   const body = req.body;
   const user = await createUsers(body);
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
   res.header("auth", user.token);
-  res.json({ data: user });
+  res.json({ user });
 });
 router.post("/login", async (req, res) => {
   const body = req.body;
   const user = await loginUser(body);
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
   res.header("auth", user.token);
-  res.json({ data: user });
+  res.json(user);
 });
 router.post("/forgot", async (req, res) => {
   const email = req.body.email;
@@ -32,12 +39,18 @@ router.post("/forgot", async (req, res) => {
 });
 router.get("/users", async (_req, res) => {
   const users = await getUsers();
-  res.json({ data: users });
+  if (users.status === "error") {
+    return res.status(users.statusCode).json({ error: users.error });
+  }
+  res.json(users);
 });
 router.get("/users/:id", async (req, res) => {
   const { id } = req.params;
   const user = await getUser(Number(id));
-  res.json({ data: user });
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
+  res.json(user);
 });
 router.get("/resetpassword/:token", async (req, res) => {
   const { token } = req.params;
@@ -49,20 +62,29 @@ router.get("/resetpassword/:token", async (req, res) => {
   // res.redirect(`http://localhost:3000/forgotpassword/${token}`);
   res.redirect(`https://bibiblog.netlify.app/forgotpassword/${token}`);
 });
-router.patch("/:id", async (req, res) => {
-  const { id } = req.params;
-  const user = await updateUser(Number(id), req.body);
-  res.json({ data: user });
+router.patch("/", authenticate, async (req: any, res) => {
+  const { id } = req.user;
+  const user = await updateUser(Number(id), req.body, req);
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
+  res.json(user);
 });
 router.patch("/resetpassword/:token", async (req, res) => {
   const { token } = req.params;
   const user = await changePassword(req.body, token);
-  res.json({ data: user });
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
+  res.json(user);
 });
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   const user = await deleteUser(Number(id));
-  res.json({ data: user });
+  if (user.status === "error") {
+    return res.status(user.statusCode).json({ error: user.error });
+  }
+  res.json(user);
 });
 
 export default router;

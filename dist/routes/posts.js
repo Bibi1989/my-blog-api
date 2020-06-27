@@ -15,7 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const post_controller_1 = require("../controllers/post_controller");
 const auth_1 = __importDefault(require("./auth"));
+const cloudinary_1 = require("cloudinary");
 const router = express_1.Router();
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield post_controller_1.getPosts();
     res.json({ data: posts });
@@ -32,14 +38,21 @@ router.get("/post/users", auth_1.default, (req, res) => __awaiter(void 0, void 0
 }));
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const { id, username, image_url } = req.user;
-    console.log(image_url);
-    if (!body.title)
-        return res.json({ status: "error", error: "Title field is empty!!!" });
-    if (!body.message)
-        return res.json({ status: "error", error: "Message field is empty!!!" });
-    const post = yield post_controller_1.createPost(body, id, username, image_url);
-    res.json({ data: post });
+    const { id, username } = req.user;
+    const post = yield post_controller_1.createPost(body, id, username);
+    if (post.status === "error") {
+        return res.status(post.statusCode).json({ error: post.error });
+    }
+    res.json(post);
+}));
+router.post("/photo", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    const { id, username } = req.user;
+    const post = yield post_controller_1.postImage(body, id, req);
+    if (post.status === "error") {
+        return res.status(post.statusCode).json({ error: post.error });
+    }
+    res.json(post);
 }));
 router.patch("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const update = req.body;

@@ -17,15 +17,31 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const crypto_1 = __importDefault(require("crypto"));
 const sendEmail_1 = require("../utils/sendEmail");
 const sequelize_1 = require("sequelize");
+const fullname_1 = require("../utils/fullname");
+const cloudinary_1 = require("cloudinary");
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    let errors = {
+        firstname: "",
+        lastname: "",
+        username: "",
+        email: "",
+        password: "",
+    };
+    if (!user.firstname)
+        errors.firstname = "First Name is empty!!!";
+    if (!user.lastname)
+        errors.lastname = "Last Name is empty!!!";
     if (!user.username)
-        return { status: "error", error: "Username is empty!!!" };
+        errors.username = "Username is empty!!!";
     if (!user.email)
-        return { status: "error", error: "Email is empty!!!" };
+        errors.email = "Email is empty!!!";
     if (!user.password)
-        return { status: "error", error: "Password is empty!!!" };
+        errors.password = "Password is empty!!!";
+    if (errors.username || errors.email || errors.password)
+        return { status: "error", statusCode: 404, error: errors };
+    const userFullname = fullname_1.fullname(user.firstname, user.lastname);
     const findUser = yield User.findOne({
         where: {
             email: user.email,
@@ -33,11 +49,15 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
     });
     try {
         if (findUser) {
-            return { status: "error", error: "User with this email exist" };
+            return {
+                status: "error",
+                statusCode: 404,
+                error: "User with this email exist",
+            };
         }
         const salt = yield bcryptjs_1.default.genSaltSync(10);
         const hashedPassword = yield bcryptjs_1.default.hash(user.password, salt);
-        const users = yield User.create(Object.assign(Object.assign({}, user), { password: hashedPassword }));
+        const users = yield User.create(Object.assign(Object.assign({}, user), { fullname: userFullname, password: hashedPassword }));
         const token = jsonwebtoken_1.default.sign({
             id: users.id,
             email: users.email,
@@ -48,7 +68,7 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error(error);
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -59,7 +79,7 @@ exports.getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "success", data: users };
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,21 +91,31 @@ exports.getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         return { status: "success", data: user };
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    let errors = {
+        email: "",
+        password: "",
+    };
     if (!user.email)
-        return { status: "error", error: "Email is empty!!!" };
+        errors.email = "Email is empty!!!";
     if (!user.password)
-        return { status: "error", error: "Password is empty!!!" };
+        errors.password = "Password is empty!!!";
+    if (errors.email || errors.password)
+        return { status: "error", statusCode: 404, error: errors };
     const findUser = yield User.findOne({
         where: {
             email: user.email,
         },
     });
     if (!findUser)
-        return { status: "error", error: "Invalid email or your yet to register" };
+        return {
+            status: "error",
+            statusCode: 404,
+            error: "Invalid email or your yet to register",
+        };
     try {
         const isMatchPassword = yield bcryptjs_1.default.compare(user.password, findUser.dataValues.password);
         if (isMatchPassword) {
@@ -98,38 +128,69 @@ exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
             return { status: "success", data: findUser.dataValues, token };
         }
         else {
-            return { status: "error", error: "password is invalid" };
+            return { status: "error", statusCode: 404, error: "password is invalid" };
         }
     }
-    catch (error) { }
+    catch (error) {
+        return { status: "error", statusCode: 400, error };
+    }
 });
-exports.updateUser = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(body);
+exports.updateUser = (id, body, req) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let user = yield User.findOne({ where: { id } });
+        console.log(body);
         if (!user)
-            return { status: "error", error: "User not found" };
-        yield User.update(body, { where: { id } });
-        return { status: "success", data: "User updated successfully!!!" };
+            return {
+                status: "error",
+                statusCode: 404,
+                error: `User with this ID: ${id} not found`,
+            };
+        if (body.username) {
+            yield User.update(body, { where: { id } });
+            return { status: "success", data: "User updated successfully!!!" };
+        }
+        let file = req.files.file;
+        if (file) {
+            let fileImage = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, { folder: "blog" }, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                return result;
+            });
+            yield User.update({ image_url: fileImage.secure_url }, { where: { id } });
+            return { status: "success", data: "User updated successfully!!!" };
+        }
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield User.findOne({ where: { id } });
+        if (!user) {
+            return {
+                status: "error",
+                statusCode: 404,
+                error: `User with this ID: ${id} not found`,
+            };
+        }
         yield User.destroy({ where: { id } });
         return { status: "success", data: "User deactivated!!!" };
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.resetPassword = (email, req) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield User.findOne({ where: { email } });
     try {
         if (!user) {
-            return { status: "error", error: "User with this email not found" };
+            return {
+                status: "error",
+                statusCode: 404,
+                error: "User with this email not found",
+            };
         }
         let resetToken = crypto_1.default.randomBytes(20).toString("hex");
         const resetPasswordToken = crypto_1.default
@@ -151,7 +212,7 @@ exports.resetPassword = (email, req) => __awaiter(void 0, void 0, void 0, functi
         return { status: "success", data: user };
     }
     catch (error) {
-        return { status: "error", error: error };
+        return { status: "error", statusCode: 400, error: error };
     }
 });
 exports.getToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -168,12 +229,12 @@ exports.getToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
             },
         });
         if (!user) {
-            return { status: "error", error: "User not found" };
+            return { status: "error", statusCode: 404, error: "User not found" };
         }
         return { status: "success", id: user.id };
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 exports.changePassword = (password, token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -188,10 +249,14 @@ exports.changePassword = (password, token) => __awaiter(void 0, void 0, void 0, 
             },
         });
         if (!user) {
-            return { status: "error", error: "User not found" };
+            return { status: "error", statusCode: 404, error: "User not found" };
         }
         if (!password) {
-            return { status: "error", error: "No password provided" };
+            return {
+                status: "error",
+                statusCode: 404,
+                error: "No password provided",
+            };
         }
         const salt = yield bcryptjs_1.default.genSaltSync(10);
         const hashedPassword = yield bcryptjs_1.default.hash(password.password, salt);
@@ -208,7 +273,7 @@ exports.changePassword = (password, token) => __awaiter(void 0, void 0, void 0, 
         return { status: "success", data: "Password changed" };
     }
     catch (error) {
-        return { status: "error", error };
+        return { status: "error", statusCode: 400, error };
     }
 });
 //# sourceMappingURL=user_controller.js.map
