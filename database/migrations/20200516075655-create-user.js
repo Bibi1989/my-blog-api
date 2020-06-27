@@ -17,6 +17,12 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
+      resetPasswordToken: {
+        type: Sequelize.STRING,
+      },
+      resetPasswordExpired: {
+        type: Sequelize.DATE,
+      },
       image_url: {
         type: Sequelize.TEXT("long"),
       },

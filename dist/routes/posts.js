@@ -33,7 +33,7 @@ router.get("/post/users", auth_1.default, (req, res) => __awaiter(void 0, void 0
 router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id, username, image_url } = req.user;
-    console.log(body);
+    console.log(image_url);
     if (!body.title)
         return res.json({ status: "error", error: "Title field is empty!!!" });
     if (!body.message)

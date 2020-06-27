@@ -14,6 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const crypto_1 = __importDefault(require("crypto"));
+const sendEmail_1 = require("../utils/sendEmail");
+const sequelize_1 = require("sequelize");
 const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,7 +37,6 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const salt = yield bcryptjs_1.default.genSaltSync(10);
         const hashedPassword = yield bcryptjs_1.default.hash(user.password, salt);
-        console.log(hashedPassword);
         const users = yield User.create(Object.assign(Object.assign({}, user), { password: hashedPassword }));
         const token = jsonwebtoken_1.default.sign({
             id: users.id,
@@ -101,10 +103,109 @@ exports.loginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) { }
 });
+exports.updateUser = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(body);
+    try {
+        let user = yield User.findOne({ where: { id } });
+        if (!user)
+            return { status: "error", error: "User not found" };
+        yield User.update(body, { where: { id } });
+        return { status: "success", data: "User updated successfully!!!" };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
 exports.deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield User.destroy({ where: { id } });
         return { status: "success", data: "User deactivated!!!" };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.resetPassword = (email, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield User.findOne({ where: { email } });
+    try {
+        if (!user) {
+            return { status: "error", error: "User with this email not found" };
+        }
+        let resetToken = crypto_1.default.randomBytes(20).toString("hex");
+        const resetPasswordToken = crypto_1.default
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+        let resetPasswordExpired = Date.now() + 10 * 60 * 1000;
+        const createLink = `${req.protocol}://${req.get("host")}/auth/v1/resetpassword/${resetToken}`;
+        console.log({ createLink });
+        let message = `You requested to reset your password click this link to create new password`;
+        const options = {
+            email,
+            subject: "Change your password",
+            message,
+            resetUrl: createLink,
+        };
+        sendEmail_1.sendEmail(options);
+        yield User.update(Object.assign(Object.assign({}, user), { resetPasswordToken, resetPasswordExpired }), { where: { id: user.id } });
+        return { status: "success", data: user };
+    }
+    catch (error) {
+        return { status: "error", error: error };
+    }
+});
+exports.getToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const resetPasswordToken = crypto_1.default
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+        const user = yield User.findOne({
+            where: {
+                [sequelize_1.Op.and]: [
+                    { resetPasswordToken, resetPasswordExpired: { [sequelize_1.Op.gt]: Date.now() } },
+                ],
+            },
+        });
+        if (!user) {
+            return { status: "error", error: "User not found" };
+        }
+        return { status: "success", id: user.id };
+    }
+    catch (error) {
+        return { status: "error", error };
+    }
+});
+exports.changePassword = (password, token) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let resetPasswordTk = crypto_1.default
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+        const user = yield User.findOne({
+            where: {
+                resetPasswordToken: resetPasswordTk,
+            },
+        });
+        if (!user) {
+            return { status: "error", error: "User not found" };
+        }
+        if (!password) {
+            return { status: "error", error: "No password provided" };
+        }
+        const salt = yield bcryptjs_1.default.genSaltSync(10);
+        const hashedPassword = yield bcryptjs_1.default.hash(password.password, salt);
+        let obj = {
+            password: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpired: null,
+        };
+        yield User.update(obj, {
+            where: {
+                id: Number(user.id),
+            },
+        });
+        return { status: "success", data: "Password changed" };
     }
     catch (error) {
         return { status: "error", error };

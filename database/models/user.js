@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       username: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      resetPasswordToken: DataTypes.STRING,
+      resetPasswordExpired: DataTypes.DATE,
       image_url: DataTypes.STRING,
     },
     {}

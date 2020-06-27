@@ -37,7 +37,7 @@ router.post("/", authenticate, async (req: any, res) => {
   const body = req.body;
   const { id, username, image_url } = req.user;
 
-  console.log(body);
+  console.log(image_url);
 
   if (!body.title)
     return res.json({ status: "error", error: "Title field is empty!!!" });

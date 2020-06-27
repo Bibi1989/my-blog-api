@@ -1,0 +1,1 @@
+echo sequelize db.migrate
