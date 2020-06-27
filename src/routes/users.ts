@@ -46,8 +46,8 @@ router.get("/resetpassword/:token", async (req, res) => {
   if (user.status === "error") {
     return res.status(404).json({ error: user.error });
   }
-  res.redirect(`http://localhost:3000/forgotpassword/${token}`);
-  // res.redirect(`https://bibiblog.netlify.app/forgotpassword`);
+  // res.redirect(`http://localhost:3000/forgotpassword/${token}`);
+  res.redirect(`https://bibiblog.netlify.app/forgotpassword/${token}`);
 });
 router.patch("/:id", async (req, res) => {
   const { id } = req.params;
