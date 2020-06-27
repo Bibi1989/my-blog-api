@@ -12,7 +12,7 @@ const authenticate = (req: any, res: any, next: NextFunction) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(404).json({ error: error });
   }
 };
 

@@ -74,6 +74,7 @@ export const createPost = async (
 
 export const postImage = async (form: any, id: number, req: any) => {
   try {
+    console.log(form);
     const img = await v2.uploader.upload(
       req.files.image.tempFilePath,
       { folder: "blog" },

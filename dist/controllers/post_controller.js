@@ -59,6 +59,7 @@ exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, f
 });
 exports.postImage = (form, id, req) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(form);
         const img = yield cloudinary_1.v2.uploader.upload(req.files.image.tempFilePath, { folder: "blog" }, (err, result) => {
             if (err) {
                 console.log(err);
