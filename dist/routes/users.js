@@ -42,7 +42,7 @@ router.get("/resetpassword/:token", (req, res) => __awaiter(void 0, void 0, void
     const { token } = req.params;
     const user = yield user_controller_1.getToken(token);
     if (user.status === "error") {
-        return res.status(404).json({ error: user.error });
+        return res.redirect(`https://bibiblog.netlify.app/error`);
     }
     // res.redirect(`http://localhost:3000/forgotpassword/${token}`);
     res.redirect(`https://bibiblog.netlify.app/forgotpassword/${token}`);
