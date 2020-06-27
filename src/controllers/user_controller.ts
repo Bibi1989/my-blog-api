@@ -164,7 +164,10 @@ export const updateUser = async (id: number, body: any, req: any) => {
     if (file) {
       let fileImage = await v2.uploader.upload(
         file.tempFilePath,
-        { folder: "blog" },
+        {
+          folder: "blog",
+          transformation: [{ width: 500, height: 350, crop: "fill" }],
+        },
         (err: Error, result: any) => {
           if (err) {
             console.log(err);

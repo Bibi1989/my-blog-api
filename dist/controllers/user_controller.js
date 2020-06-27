@@ -151,7 +151,10 @@ exports.updateUser = (id, body, req) => __awaiter(void 0, void 0, void 0, functi
         }
         let file = req.files.file;
         if (file) {
-            let fileImage = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, { folder: "blog" }, (err, result) => {
+            let fileImage = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, {
+                folder: "blog",
+                transformation: [{ width: 500, height: 350, crop: "fill" }],
+            }, (err, result) => {
                 if (err) {
                     console.log(err);
                 }
