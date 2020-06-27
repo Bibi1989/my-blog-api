@@ -57,7 +57,7 @@ exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, f
         return { status: "error", statusCode: 400, error };
     }
 });
-exports.postImage = (form, id, req) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postImage = (form, id, username, req) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(form);
         const img = yield cloudinary_1.v2.uploader.upload(req.files.image.tempFilePath, { folder: "blog" }, (err, result) => {
@@ -66,7 +66,7 @@ exports.postImage = (form, id, req) => __awaiter(void 0, void 0, void 0, functio
             }
             return result;
         });
-        const posts = yield Post.create(Object.assign(Object.assign({}, form), { image_url: img.secure_url, userId: Number(id) }));
+        const posts = yield Post.create(Object.assign(Object.assign({}, form), { image_url: img.secure_url, username, userId: Number(id) }));
         return { status: "success", data: posts };
     }
     catch (error) {

@@ -57,7 +57,7 @@ router.post("/photo", authenticate, async (req: any, res) => {
   const body = req.body;
   const { id, username } = req.user;
 
-  const post = await postImage(body, id, req);
+  const post = await postImage(body, id, username, req);
 
   if (post.status === "error") {
     return res.status(post.statusCode).json({ error: post.error });

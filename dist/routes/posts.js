@@ -48,7 +48,7 @@ router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0,
 router.post("/photo", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id, username } = req.user;
-    const post = yield post_controller_1.postImage(body, id, req);
+    const post = yield post_controller_1.postImage(body, id, username, req);
     if (post.status === "error") {
         return res.status(post.statusCode).json({ error: post.error });
     }

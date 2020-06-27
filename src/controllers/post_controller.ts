@@ -72,7 +72,12 @@ export const createPost = async (
   }
 };
 
-export const postImage = async (form: any, id: number, req: any) => {
+export const postImage = async (
+  form: any,
+  id: number,
+  username: string,
+  req: any
+) => {
   try {
     console.log(form);
     const img = await v2.uploader.upload(
@@ -89,6 +94,7 @@ export const postImage = async (form: any, id: number, req: any) => {
     const posts = await Post.create({
       ...form,
       image_url: img.secure_url,
+      username,
       userId: Number(id),
     });
 
