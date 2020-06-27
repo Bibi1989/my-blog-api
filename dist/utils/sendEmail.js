@@ -22,7 +22,7 @@ exports.sendEmail = (options) => {
             from: "BibiBlog <blogbibi1989@gmail.com>",
             to: email,
             subject,
-            html: `${message} <a href=${resetUrl}>Reset Password</a>`,
+            html: `${message} <a href=${resetUrl}>Reset Password</a> Token Expire After 10 minute`,
         };
         transporter.sendMail(message_info, (err, data) => {
             if (err) {

@@ -27,7 +27,7 @@ export const sendEmail = (options: SendMailInterface) => {
       from: "BibiBlog <blogbibi1989@gmail.com>", // sender address
       to: email,
       subject,
-      html: `${message} <a href=${resetUrl}>Reset Password</a>`,
+      html: `${message} <a href=${resetUrl}>Reset Password</a> Token Expire After 10 minute`,
     };
 
     transporter.sendMail(message_info, (err: Error, data: any) => {
