@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
     return res.status(user.statusCode).json({ error: user.error });
   }
   res.header("auth", user.token);
-  res.json({ user });
+  res.json(user);
 });
 router.post("/login", async (req, res) => {
   const body = req.body;

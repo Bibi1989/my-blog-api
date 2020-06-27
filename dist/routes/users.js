@@ -23,7 +23,7 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(user.statusCode).json({ error: user.error });
     }
     res.header("auth", user.token);
-    res.json({ user });
+    res.json(user);
 }));
 router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
