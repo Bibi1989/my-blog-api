@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
   let page = Number(req.query.page) || 1;
   let limit = Number(req.query.limit) || 10;
   const posts = await getPosts(page, limit);
-  res.json({ data: posts });
+  res.json(posts);
 });
 router.get("/:postId", authenticate, async (req, res) => {
   const { postId } = req.params;
