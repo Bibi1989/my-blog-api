@@ -69,6 +69,18 @@ exports.createUsers = (user) => __awaiter(void 0, void 0, void 0, function* () {
             username: users.username,
             image_url: users.image_url,
         }, process.env.SECRET_KEY);
+        // const data = await User.findOne({
+        //   where: { id: users.id },
+        //   attributes: [
+        //     "id",
+        //     "fullname",
+        //     "firstname",
+        //     "lastname",
+        //     "email",
+        //     "image_url",
+        //     "createdAt",
+        //   ],
+        // });
         return { status: "success", data: users, token };
     }
     catch (error) {

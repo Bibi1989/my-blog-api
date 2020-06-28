@@ -27,7 +27,9 @@ v2.config({
 });
 
 router.get("/", async (req, res) => {
-  const posts = await getPosts();
+  let page = Number(req.query.page) || 1;
+  let limit = Number(req.query.limit) || 10;
+  const posts = await getPosts(page, limit);
   res.json({ data: posts });
 });
 router.get("/:postId", authenticate, async (req, res) => {

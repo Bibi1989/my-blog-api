@@ -73,6 +73,18 @@ export const createUsers = async (user: userInterface) => {
       },
       process.env.SECRET_KEY
     );
+    // const data = await User.findOne({
+    //   where: { id: users.id },
+    //   attributes: [
+    //     "id",
+    //     "fullname",
+    //     "firstname",
+    //     "lastname",
+    //     "email",
+    //     "image_url",
+    //     "createdAt",
+    //   ],
+    // });
     return { status: "success", data: users, token };
   } catch (error) {
     return { status: "error", statusCode: 400, error };

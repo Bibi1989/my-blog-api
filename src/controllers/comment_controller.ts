@@ -23,7 +23,7 @@ export const createComment = async (
       });
       return { status: "success", comments };
     }
-    return { status: "error", message: "Post not found" };
+    return { status: "error", data: "Post not found" };
   } catch (error) {
     console.error(error);
     return { status: "error", error };
@@ -38,7 +38,7 @@ export const getComments = async (postId: number) => {
       },
       include: [User, Post],
     });
-    return { status: "success", comments };
+    return { status: "success", data: comments };
   } catch (error) {
     return { status: "error", error };
   }

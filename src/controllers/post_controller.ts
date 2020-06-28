@@ -79,7 +79,6 @@ export const postImage = async (
   req: any
 ) => {
   try {
-    console.log(form);
     const img = await v2.uploader.upload(
       req.files.image.tempFilePath,
       { folder: "blog" },
@@ -104,12 +103,46 @@ export const postImage = async (
   }
 };
 
-export const getPosts = async () => {
+export const getPosts = async (page: number, limit: number) => {
   try {
+    let startIndex = (page - 1) * limit;
+    let lastIndex = page * limit;
+
     const posts = await Post.findAll({
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset: startIndex,
       include: [User, Comment, Like],
     });
-    return { status: "success", data: posts };
+
+    const paginate: {
+      hasMore: boolean;
+      next?: number;
+      prev?: number;
+      count: number;
+    } = {
+      hasMore: false,
+      count: 0,
+    };
+
+    const count = await Post.count();
+
+    const hasMore = lastIndex < count;
+
+    const hasLess = startIndex >= limit;
+
+    if (hasMore) {
+      paginate.next = hasMore && page + 1;
+    }
+
+    if (hasLess) {
+      paginate.prev = hasLess && page - 1;
+    }
+
+    paginate.hasMore = hasMore;
+    paginate.count = count;
+
+    return { status: "success", paginate, data: posts };
   } catch (error) {
     return { status: "error", error };
   }

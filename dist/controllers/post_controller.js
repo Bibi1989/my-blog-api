@@ -59,7 +59,6 @@ exports.createPost = (post, id, username) => __awaiter(void 0, void 0, void 0, f
 });
 exports.postImage = (form, id, username, req) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(form);
         const img = yield cloudinary_1.v2.uploader.upload(req.files.image.tempFilePath, { folder: "blog" }, (err, result) => {
             if (err) {
                 console.log(err);
@@ -73,12 +72,32 @@ exports.postImage = (form, id, username, req) => __awaiter(void 0, void 0, void 
         return { status: "error", statusCode: 400, error };
     }
 });
-exports.getPosts = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.getPosts = (page, limit) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        let startIndex = (page - 1) * limit;
+        let lastIndex = page * limit;
         const posts = yield Post.findAll({
+            order: [["createdAt", "DESC"]],
+            limit,
+            offset: startIndex,
             include: [User, Comment, Like],
         });
-        return { status: "success", data: posts };
+        const paginate = {
+            hasMore: false,
+            count: 0,
+        };
+        const count = yield Post.count();
+        const hasMore = lastIndex < count;
+        const hasLess = startIndex >= limit;
+        if (hasMore) {
+            paginate.next = hasMore && page + 1;
+        }
+        if (hasLess) {
+            paginate.prev = hasLess && page - 1;
+        }
+        paginate.hasMore = hasMore;
+        paginate.count = count;
+        return { status: "success", paginate, data: posts };
     }
     catch (error) {
         return { status: "error", error };

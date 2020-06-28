@@ -20,16 +20,15 @@ router.post("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, 
     const { message } = req.body;
     const { id } = req.user;
     const { postId } = req.params;
-    console.log({ message, body: req.body });
     if (!message)
         return res.json({ status: "error", error: "Message field is empty!!!" });
     const link = yield comment_controller_1.createComment(message, Number(id), Number(postId));
-    res.json({ data: link });
+    res.json(link);
 }));
 router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId } = req.params;
     const comments = yield comment_controller_1.getComments(Number(postId));
-    res.json({ data: comments });
+    res.json(comments);
 }));
 exports.default = router;
 //# sourceMappingURL=comment.js.map

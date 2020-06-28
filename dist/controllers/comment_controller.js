@@ -22,7 +22,7 @@ exports.createComment = (message, userId, postId) => __awaiter(void 0, void 0, v
             });
             return { status: "success", comments };
         }
-        return { status: "error", message: "Post not found" };
+        return { status: "error", data: "Post not found" };
     }
     catch (error) {
         console.error(error);
@@ -37,7 +37,7 @@ exports.getComments = (postId) => __awaiter(void 0, void 0, void 0, function* ()
             },
             include: [User, Post],
         });
-        return { status: "success", comments };
+        return { status: "success", data: comments };
     }
     catch (error) {
         return { status: "error", error };

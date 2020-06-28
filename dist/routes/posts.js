@@ -23,7 +23,9 @@ cloudinary_1.v2.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield post_controller_1.getPosts();
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 10;
+    const posts = yield post_controller_1.getPosts(page, limit);
     res.json({ data: posts });
 }));
 router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
