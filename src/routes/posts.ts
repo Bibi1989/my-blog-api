@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
 router.get("/:postId", authenticate, async (req, res) => {
   const { postId } = req.params;
   console.log(postId);
-  // const posts = await getAPost(Number(postId));
+  const posts = await getAPost(Number(postId));
   res.json({ data: postId });
 });
 router.get("/post/users", authenticate, async (req: any, res) => {

@@ -25,7 +25,7 @@ exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, voi
         }
         else {
             yield Like.destroy({ where: { postId, userId } });
-            return { status: "error", like: "Post not found" };
+            return { status: "error", message: "Post not found" };
         }
     }
     catch (error) {
