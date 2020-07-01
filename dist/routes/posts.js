@@ -30,8 +30,9 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId } = req.params;
-    const posts = yield post_controller_1.getAPost(Number(postId));
-    res.json({ data: posts });
+    console.log(postId);
+    // const posts = await getAPost(Number(postId));
+    res.json({ data: postId });
 }));
 router.get("/post/users", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.user;

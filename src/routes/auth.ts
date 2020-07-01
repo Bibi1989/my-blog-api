@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 const authenticate = (req: any, res: any, next: NextFunction) => {
   const token = req.headers["auth"];
   if (!token) {
-    throw Error("unauthorize user, access denied");
+    res
+      .status(401)
+      .json({ status: "error", error: "unauthorize user, access denied" });
   }
 
   try {
@@ -12,7 +14,7 @@ const authenticate = (req: any, res: any, next: NextFunction) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(404).json({ error: error });
+    res.status(404).json({ status: "error", error: error.message });
   }
 };
 

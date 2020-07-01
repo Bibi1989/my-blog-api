@@ -7,7 +7,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authenticate = (req, res, next) => {
     const token = req.headers["auth"];
     if (!token) {
-        throw Error("unauthorize user, access denied");
+        res
+            .status(401)
+            .json({ status: "error", error: "unauthorize user, access denied" });
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
@@ -15,7 +17,7 @@ const authenticate = (req, res, next) => {
         next();
     }
     catch (error) {
-        res.status(404).json({ error: error });
+        res.status(404).json({ status: "error", error: error.message });
     }
 };
 exports.default = authenticate;
