@@ -36,7 +36,7 @@ router.get("/:postId", authenticate, async (req, res) => {
   const { postId } = req.params;
   console.log(postId);
   const posts = await getAPost(Number(postId));
-  res.json({ data: postId });
+  res.json({ data: posts });
 });
 router.get("/post/users", authenticate, async (req: any, res) => {
   const { id } = req.user;
