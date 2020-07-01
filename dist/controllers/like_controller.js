@@ -13,7 +13,7 @@ const models = require("../../database/models/");
 const { User, Post, Comment, Like } = models;
 exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const findPost = yield Like.findAll({ where: { postId, userId } });
+        const findPost = yield Like.findOne({ where: { postId, userId } });
         if (!findPost) {
             const like = yield Like.create({
                 message: `${username} liked your post`,
