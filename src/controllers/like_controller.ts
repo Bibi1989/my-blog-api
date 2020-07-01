@@ -26,7 +26,7 @@ export const createLike = async (
       return { status: "success", like };
     } else {
       await Like.destroy({ where: { postId, userId } });
-      return { status: "error", like: "Post not found" };
+      return { status: "error", message: "Post not found" };
     }
   } catch (error) {
     console.error(error);
