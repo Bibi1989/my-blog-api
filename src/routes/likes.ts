@@ -9,6 +9,9 @@ router.post("/", authenticate, async (req: any, res) => {
   const { postId } = req.body;
   console.log(postId);
   const link = await createLike(Number(id), Number(postId), username);
+  if (link.status === "error") {
+    res.status(404).json(link);
+  }
   res.json({ data: link });
 });
 

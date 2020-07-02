@@ -33,6 +33,22 @@ exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, voi
         return { status: "error", error };
     }
 });
+// export const destroyLike = async (
+//   userId: number,
+//   postId: number,
+//   username: string
+// ) => {
+//   try {
+//     const findPost = await Like.findOne({ where: { postId, userId } });
+//     if (findPost) {
+//       await Like.destroy({ where: { postId, userId } });
+//       return { status: "error", message: "Post not found" };
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return { status: "error", error };
+//   }
+// };
 exports.getLikes = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const likes = yield Like.findAll({

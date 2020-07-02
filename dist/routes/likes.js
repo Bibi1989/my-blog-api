@@ -21,6 +21,9 @@ router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0,
     const { postId } = req.body;
     console.log(postId);
     const link = yield like_controller_1.createLike(Number(id), Number(postId), username);
+    if (link.status === "error") {
+        res.status(404).json(link);
+    }
     res.json({ data: link });
 }));
 router.get("/:id", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
