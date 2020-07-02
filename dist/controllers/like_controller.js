@@ -33,15 +33,15 @@ exports.createLike = (userId, postId, username) => __awaiter(void 0, void 0, voi
         return { status: "error", error };
     }
 });
-exports.getLikes = (postId) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getLikes = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const likes = yield Like.findAll({
             where: {
-                postId,
+                id,
             },
             include: [User, Post],
         });
-        return { status: "success", likes };
+        return { status: "success", likes, likeCount: likes.length };
     }
     catch (error) {
         return { status: "error", error };

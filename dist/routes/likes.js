@@ -23,9 +23,9 @@ router.post("/", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0,
     const link = yield like_controller_1.createLike(Number(id), Number(postId), username);
     res.json({ data: link });
 }));
-router.get("/:postId", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { postId } = req.params;
-    const likes = yield like_controller_1.getLikes(Number(postId));
+router.get("/:id", auth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const likes = yield like_controller_1.getLikes(Number(id));
     res.json({ data: likes });
 }));
 exports.default = router;

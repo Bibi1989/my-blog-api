@@ -34,15 +34,15 @@ export const createLike = async (
   }
 };
 
-export const getLikes = async (postId: number) => {
+export const getLikes = async (id: number) => {
   try {
     const likes = await Like.findAll({
       where: {
-        postId,
+        id,
       },
       include: [User, Post],
     });
-    return { status: "success", likes };
+    return { status: "success", likes, likeCount: likes.length };
   } catch (error) {
     return { status: "error", error };
   }

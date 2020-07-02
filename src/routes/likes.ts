@@ -12,9 +12,9 @@ router.post("/", authenticate, async (req: any, res) => {
   res.json({ data: link });
 });
 
-router.get("/:postId", authenticate, async (req, res) => {
-  const { postId } = req.params;
-  const likes = await getLikes(Number(postId));
+router.get("/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+  const likes = await getLikes(Number(id));
   res.json({ data: likes });
 });
 
