@@ -17,7 +17,9 @@ import likeRoute from "./routes/likes";
 import noticeRoute from "./routes/notification";
 import userRoute from "./routes/users";
 
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
